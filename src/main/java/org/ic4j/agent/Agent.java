@@ -47,6 +47,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.ic4j.agent.certification.Certificate;
 import org.ic4j.agent.certification.Delegation;
 import org.ic4j.agent.certification.hashtree.Label;
+import org.ic4j.agent.identity.ExternalMultiSignIdentity;
 import org.ic4j.agent.identity.Identity;
 import org.ic4j.agent.identity.Signature;
 import org.ic4j.agent.replicaapi.CallRequestContent;
@@ -92,6 +93,8 @@ public final class Agent {
 	Optional<byte[]> rootKey;
 	
 	static Map<Principal, Subnet> subnetCache = new WeakHashMap<Principal,Subnet>();
+	Map<String, SignedReadStateRequest> signedRequestStatusRequests = new HashMap<>();
+
 	
 	boolean verify = true;
 	
@@ -593,7 +596,8 @@ public final class Agent {
 		RequestId requestId = RequestId.toRequestId(request);
 		byte[] msg = this.constructMessage(requestId);
 
-		Signature signature = this.identity.sign(msg);
+
+		Signature signature = getCallRequestSignature(request);
 
 		ObjectMapper objectMapper = new ObjectMapper(new CBORFactory()).registerModule(new Jdk8Module());
 
@@ -1123,12 +1127,9 @@ public final class Agent {
 
 	public <T> CompletableFuture<StateResponse<T>> readStateEndpoint(Principal effectiveCanisterId, ReadStateContent request, Map<String,String> headers,
 			Class<T> clazz) throws AgentError {
-
-		RequestId requestId = RequestId.toRequestId(request);
-
-		byte[] msg = this.constructMessage(requestId);
-
-		Signature signature = this.identity.sign(msg);
+		SignedReadStateRequest signedReadStateContent = getSignedReadStateRequest(request);
+		ReadStateContent requestToUse = signedReadStateContent.request;
+		Signature signature = signedReadStateContent.signature;
 
 		ObjectMapper objectMapper = new ObjectMapper(new CBORFactory()).registerModule(new Jdk8Module());
 
@@ -1136,7 +1137,7 @@ public final class Agent {
 
 		Envelope<ReadStateContent> envelope = new Envelope<ReadStateContent>();
 
-		envelope.content = request;
+		envelope.content = requestToUse;
 		envelope.senderPubkey = signature.publicKey;
 		envelope.senderSig = signature.signature;
 
@@ -1197,14 +1198,79 @@ public final class Agent {
 		JsonFactory jsonFactory = new JsonFactory();
 		StringWriter stringWriter = new StringWriter();
 		JsonGenerator jsonGenerator = jsonFactory.createGenerator(stringWriter);
-	while (cborParser.nextToken() != null) {
-		jsonGenerator.copyCurrentEvent(cborParser);
+		while (cborParser.nextToken() != null) {
+			jsonGenerator.copyCurrentEvent(cborParser);
+		}
+		jsonGenerator.flush();
+		return stringWriter.toString();
 	}
-	jsonGenerator.flush();
-	return stringWriter.toString();
-}	
-	
-	
+
+	public static ReadStateContent getRequestStatusRequest(
+			RequestId callRequestId,
+			Principal sender,
+			Long expiryDate
+	) {
+		List<byte[]> path = new ArrayList<>();
+		path.add("request_status".getBytes());
+		path.add(callRequestId.get());
+
+		List<List<byte[]>> paths = new ArrayList<>();
+		paths.add(path);
+
+		ReadStateContent readStateContent = new ReadStateContent();
+
+		readStateContent.readStateRequest.paths = paths;
+		readStateContent.readStateRequest.sender = sender;
+		readStateContent.readStateRequest.ingressExpiry = expiryDate;
+
+		return readStateContent;
+	}
+
+	private Signature getCallRequestSignature(CallRequestContent request) {
+		RequestId callRequestId = RequestId.toRequestId(request);
+		byte[] callRequestMsg = this.constructMessage(callRequestId);
+
+		if (this.identity instanceof ExternalMultiSignIdentity) {
+			ReadStateContent requestStatusRequest = getRequestStatusRequest(
+					callRequestId,
+					identity.sender(),
+					getExpiryDate()
+			);
+			RequestId requestStatusRequestId = RequestId.toRequestId(requestStatusRequest);
+
+			byte[] requestStatusRequestMsg = this.constructMessage(requestStatusRequestId);
+			List<byte[]> msgsToSign = Arrays.asList(callRequestMsg, requestStatusRequestMsg);
+			List<Signature> signatures = ((ExternalMultiSignIdentity) this.identity).multiSignArbitrary(msgsToSign);
+
+			signedRequestStatusRequests.put(
+					callRequestId.toHexString(),
+					new SignedReadStateRequest(requestStatusRequest, signatures.get(1))
+			);
+
+			return signatures.get(0);
+		} else {
+			return this.identity.sign(callRequestMsg);
+		}
+	}
+
+	private SignedReadStateRequest getSignedReadStateRequest(ReadStateContent request) {
+		try {
+			if (new String(request.readStateRequest.paths.get(0).get(0)).equals("request_status")) {
+				RequestId callRequestId = RequestId.fromHex(request.readStateRequest.paths.get(0).get(1));
+				SignedReadStateRequest signedRequestStatusRequest =
+						signedRequestStatusRequests.get(callRequestId.toHexString());
+				if (signedRequestStatusRequest != null) {
+					return signedRequestStatusRequest;
+				}
+			}
+		} catch (Exception ignored) {}
+
+		RequestId requestId = RequestId.toRequestId(request);
+		byte[] msg = this.constructMessage(requestId);
+		Signature signature = this.identity.sign(msg);
+
+        return new SignedReadStateRequest(request, signature);
+	}
 	
 	public void close()
 	{
@@ -1225,5 +1291,14 @@ public final class Agent {
 	public class CertificateResponse{
 		public Certificate certificate;
 		public Map<String,String> headers;
+	}
+
+	private static class SignedReadStateRequest {
+		public SignedReadStateRequest(ReadStateContent request, Signature signature) {
+			this.request = request;
+			this.signature = signature;
+		}
+		public ReadStateContent request;
+		public Signature signature;
 	}
 }
