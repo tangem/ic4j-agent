@@ -40,7 +40,7 @@ public class ExternalMultiSignIdentity extends Identity {
 
     @Override
     public Signature signArbitrary(byte[] content) {
-        return multiSignArbitrary(Collections.singletonList(content)).get(0);
+        throw new RuntimeException("Trying to sign single hash with MultiSingIdentity");
     }
 
     public List<Signature> multiSignArbitrary(List<byte[]> contents) {
