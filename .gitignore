@@ -4,4 +4,4 @@
 /.settings/
 /bin/
 /build-export.gradle
-/gradle.properties
+.idea

@@ -9,13 +9,12 @@
 plugins {
     id 'java'
     id 'eclipse'
-    id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm'
 }
-
+apply from: '../ic4j-agent/upload-github.gradle'
 
 group 'org.ic4j'
-version '0.0.1'
+version 'tangem-0.0.1'
 
 
 repositories {
@@ -105,19 +104,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
-
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'org.ic4j'
-            artifactId = 'ic4j-agent'
-            version = '0.0.1'
-
-            from components.java
-        }
-    }
-}
 kotlin {
     jvmToolchain(8)
 }

@@ -1,0 +1,62 @@
+name: Neutral Build
+
+on:
+  push:
+    branches: 
+    - 'master'
+  workflow_dispatch:  
+
+env:
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_DVELOPMENT_ANDROID }}
+
+jobs:
+  tag:
+    name: Create tag
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: '17'
+    
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+    
+    - name: Create tag
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{ github.token }}
+        script: |
+          github.git.createRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: "refs/tags/${{ steps.extract_branch.outputs.branch }}-${{ github.run_number }}",
+            sha: context.sha
+          })
+          
+    - name: Build and publish
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      run: |
+        echo sdk.dir = $ANDROID_HOME > local.properties
+        ./gradlew -PgithubUser=${{ secrets.GITHUB_ACTOR }} -PgithubPass=${{ secrets.GITHUB_TOKEN }} -PartifactVersion=${{ steps.extract_branch.outputs.branch }}-${{ github.run_number }} publish
+
+    - name: Build notification
+      if: always()
+      uses: adamkdean/simple-slack-notify@master
+      with:
+        channel: '#development-android'
+        status: ${{ job.status }}
+        success_text: 'IC4J build (${{ steps.extract_branch.outputs.branch }}-${{ github.run_number }}) has been created and uploaded to Github Registry.'
+        failure_text: 'GitHub Action #${{ github.run_number }} failed. Tag has not been not created.'
+        cancelled_text: 'GitHub Action #${{ github.run_number }} was cancelled'
+        fields: |
+          [{"title": "TAG", "value": "${{ steps.extract_branch.outputs.branch }}-${{ github.run_number }}"},
+          {"title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
