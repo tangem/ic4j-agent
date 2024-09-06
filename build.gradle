@@ -13,8 +13,8 @@ plugins {
 }
 apply from: '../ic4j-agent/upload-github.gradle'
 
-group 'org.ic4j'
-version 'tangem-0.0.1'
+group 'com.tangem.ic4j'
+version '0.0.1'
 
 
 repositories {
