@@ -9,7 +9,7 @@ afterEvaluate {
                 artifactId = "$project.artifactId"
                 version = "$project.artifactVersion"
 
-                artifact fatJar
+                artifact jar
 //                from components.java
 
                 pom.withXml {

@@ -23,6 +23,7 @@ repositories {
 }
 
 jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes('Implementation-Title': 'ic4j-agent',
                    'Implementation-Version': project.version)
