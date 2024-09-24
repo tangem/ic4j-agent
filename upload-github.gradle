@@ -1,4 +1,5 @@
 apply plugin: 'maven-publish'
+apply plugin: 'com.gradleup.shadow'
 
 afterEvaluate {
     publishing {
@@ -9,7 +10,7 @@ afterEvaluate {
                 artifactId = "$project.artifactId"
                 version = "$project.artifactVersion"
 
-                artifact shadowJar
+                from components.shadow
 //                from components.java
 
                 pom.withXml {
