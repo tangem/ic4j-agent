@@ -75,7 +75,7 @@ test {
 }
 
 dependencies {
-    shadow group: 'org.ic4j', name: 'ic4j-candid', version: '0.7.1'
+    shadow group: 'org.ic4j', name: 'ic4j-candid', version: '0.7.4'
 
     // https://mvnrepository.com/artifact/commons-codec/commons-codec
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.17.0'
