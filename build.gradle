@@ -57,6 +57,13 @@ tasks.named('shadowJar', ShadowJar) {
     archiveBaseName = 'ic4j-agent'
     archiveClassifier = ''
     relocate 'org.apache.commons', 'shadow.apache.commons'
+    dependencies {
+        exclude {
+            it.moduleGroup == 'org.slf4j'
+            it.moduleGroup == 'org.jetbrains.kotlin'
+            it.moduleGroup == 'org.jetbrains'
+        }
+    }
 }
 
 test {
@@ -68,7 +75,7 @@ test {
 }
 
 dependencies {
-	implementation group: 'org.ic4j', name: 'ic4j-candid', version: '0.7.1'
+	shadow group: 'org.ic4j', name: 'ic4j-candid', version: '0.7.1'
 	
 	// https://mvnrepository.com/artifact/commons-codec/commons-codec
 	implementation group: 'commons-codec', name: 'commons-codec', version: '1.17.0'
@@ -80,25 +87,25 @@ dependencies {
 	implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.3.1'
 	
 	// https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
-	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+	shadow group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.2'
+    shadow group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.2'
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jdk8
-	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.17.2'
+    shadow group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.17.2'
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor
-	implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-cbor', version: '2.17.2'
+	shadow group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-cbor', version: '2.17.2'
 
 	// https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on
-	implementation group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.78.1'
+	shadow group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.78.1'
 
 	// https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk18on
-	implementation group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.78.1'
+	shadow group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.78.1'
 	
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
-	implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.13'	
+	shadow group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.13'
 
 	// https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
 	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.0'
@@ -117,7 +124,7 @@ dependencies {
 	
 	// https://mvnrepository.com/artifact/org.mock-server/mockserver-junit-rule
 	testImplementation group: 'org.mock-server', name: 'mockserver-junit-jupiter', version: '5.11.2'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    shadow "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 kotlin {
