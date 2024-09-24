@@ -55,7 +55,6 @@ tasks.named('shadowJar', ShadowJar) {
                 'Implementation-Version': project.version)
     }
     archiveBaseName = 'ic4j-agent'
-    archiveClassifier = ''
     relocate 'org.apache.commons', 'shadow.apache.commons'
 }
 
