@@ -54,6 +54,7 @@ tasks.named('shadowJar', ShadowJar) {
         attributes('Implementation-Title': 'ic4j-agent',
                 'Implementation-Version': project.version)
     }
+    configurations = [project.configurations.compileClasspath]
     archiveBaseName = 'ic4j-agent'
     archiveClassifier = ''
     relocate 'org.apache.commons', 'shadow.apache.commons'
