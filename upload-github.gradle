@@ -9,7 +9,7 @@ afterEvaluate {
                 artifactId = "$project.artifactId"
                 version = "$project.artifactVersion"
 
-                components.shadow
+                artifact shadowJar
 //                from components.java
 
                 pom.withXml {
