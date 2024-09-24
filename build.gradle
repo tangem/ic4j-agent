@@ -18,7 +18,6 @@ version '0.0.1'
 
 
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
@@ -54,19 +53,19 @@ test {
 }
 
 dependencies {
-	implementation group: 'org.ic4j', name: 'ic4j-candid', version: '0.7.1'
-	
-	// https://mvnrepository.com/artifact/commons-codec/commons-codec
-	implementation group: 'commons-codec', name: 'commons-codec', version: '1.17.0'
-	
-	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
+	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+	compileOnly group: 'org.slf4j', name: 'slf4j-api', version: '2.0.16'
 
 	// https://mvnrepository.com/artifact/org.apache.httpcomponents.client5/httpclient5
-	implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.3.1'
+	compileOnly group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.3.1'
 	
 	// https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
-	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+	compileOnly group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+
+	implementation group: 'org.ic4j', name: 'ic4j-candid', version: '0.7.4'
+
+	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.2'
@@ -82,21 +81,27 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk18on
 	implementation group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.78.1'
-	
-	// https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
-	implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.13'	
 
 	// https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.0'
+	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.11.0'
 	
 	// https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
-	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.0'
+	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.11.0'
 	
 	// https://mvnrepository.com/artifact/org.junit.platform/junit-platform-launcher
-	testImplementation group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.10.0'	
+	testImplementation group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.11.0'
+
+	// https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+	testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.16'
+
+	// https://mvnrepository.com/artifact/org.apache.httpcomponents.client5/httpclient5
+	testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.3.1'
+
+	// https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
+	testImplementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
 	
 	// https://mvnrepository.com/artifact/org.skyscreamer/jsonassert
-	testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.1'	
+	testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.3'
 	
 	// https://mvnrepository.com/artifact/org.mock-server/mockserver-netty
 	testImplementation group: 'org.mock-server', name: 'mockserver-netty', version: '5.11.2'

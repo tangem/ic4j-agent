@@ -26,10 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import org.ic4j.agent.DigestUtils;
 import org.ic4j.agent.Serialize;
 import org.ic4j.agent.Serializer;
-import org.ic4j.candid.ByteUtils;
 import org.ic4j.candid.Leb128;
 import org.ic4j.types.Principal;
 import org.slf4j.Logger;
@@ -71,7 +70,7 @@ public final class RequestIdSerializer implements Serializer {
 		else
 			bytes = value.toString().getBytes();
 
-		byte[] result	=	DigestUtils.sha256(bytes);
+		byte[] result	= DigestUtils.sha256(bytes);
 		
 		return result;
 	}
